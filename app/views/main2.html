@@ -1,0 +1,45 @@
+<!--<div ng-bind="testInput"><input type="text"/></div>-->
+<!--{{testInput}}-->
+
+<!--Two times <input ng-model="num"> equals {{ double(num) }}-->
+
+
+
+<!--<div ng-repeat="name in competitors.names">-->
+    <!--{{name}}-->
+    <!--<input type="text"/>-->
+<!--</div>-->
+
+
+        <table>
+            <td></td>
+            <td ng-repeat="name in competitors.names">{{name}}</td>
+            <td ng-repeat="header in headers.titles">{{header}}</td>
+            <tr ng-repeat="name1 in competitors.names">
+               <td>{{name1}}</td>
+                <td ng-repeat="name2 in competitors.names">
+                    <input type="text"
+                           ng-model="scoresTable[name1][name2]"
+                           ng-hide="isSameComp(name1, name2)"
+                        /></td>
+                <td>{{tableVictories[name1]}}</td>
+                <td>{{tableHS[name1]}}</td>
+                <td>{{tableHR[name1]}}</td>
+                <td>{{tableDiff[name1]}}</td>
+                <td>{{tablePositions[name1]}}</td>
+            </tr>
+            <td><button ng-click="addCompetitor('Pato')">
+                Pato!
+            </button></td>
+
+        </table>
+
+        {{competitors}}
+{{count}}
+        <!--{{competitors}}-->
+
+        <!--{{createScores(competitors) | json}}-->
+        {{resultsTable}}
+
+
+<!--scores.name.name2-->
