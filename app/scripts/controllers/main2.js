@@ -174,6 +174,15 @@ angular.module('testTableAppApp')
                     $scope.tablePositions[value.name] = pos++;
                 }
             });
-        }
+        };
+
+        $scope.myData = [
+            {
+                "firstName": "Cox",
+                "lastName": "Carney"
+            }];
+
+
+
 
   });
