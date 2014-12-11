@@ -8,15 +8,15 @@
  * Controller of the testTableAppApp
  */
 angular.module('testTableAppApp')
-  .controller('Main2Ctrl', function ($scope, $filter, $log) {
+  .controller('Main2Ctrl', function ($scope, $filter, $log, $window) {
 
 
         //Services variables
         $scope.competitors = {
-            "names": [
-                "Juan",
-                "Martin",
-                "Raul"
+            'names': [
+                'Juan',
+                'Martin',
+                'Raul'
             ]
         };
 
@@ -35,8 +35,9 @@ angular.module('testTableAppApp')
                     for (var j = 0; j < len; j++) {
                         var jName = competitors.names[j];
 
-                        if (jName != iName)
+                        if (jName !== iName) {
                             scoresDefault[iName][jName] = 0;
+                        }
                     }
                 }
 
@@ -45,17 +46,17 @@ angular.module('testTableAppApp')
             $scope.scoresTable = createScores($scope.competitors);
 
 
-        }
+        };
         init();
 
         //Scope variables
         $scope.headers = {
-            "titles": [
-                "Victories",
-                "HS_",
-                "HR_",
-                "Diff_",
-                "Pos_"
+            'titles': [
+                'Victories',
+                'Hits Scored',
+                'Hits Received',
+                'Difference',
+                'Position'
             ]
         };
 
@@ -63,18 +64,34 @@ angular.module('testTableAppApp')
 
         //Scope functions
         $scope.isSameComp = function(name1, name2){
-            return name1 == name2;
-        }
+            return name1 === name2;
+        };
+
+        $scope.sameCompChar = function(name1, name2){
+            return name1 === name2 ? 'X' : '';
+        };
 
         $scope.addCompetitor = function(name){
-            $scope.competitors.names.push(name);
-            $scope.scoresTable[name] = {};
-            angular.forEach($scope.scoresTable, function(value, key){
-                $scope.scoresTable[name][key] = 0;
-                value[name] = 0;
-//                $log.log(value);
+            var duplicateCompetitor = false;
+            angular.forEach($scope.competitors.names, function(comp){
+               if(comp === name){
+                   duplicateCompetitor = true;
+               }
+//                $log.log(name == comp);
             });
-            $log.log($scope.scoresTable);
+                if(duplicateCompetitor === false) {
+//                    $log.log("ASDASDSDASD");
+                    $scope.competitors.names.push(name);
+                    $scope.scoresTable[name] = {};
+                    angular.forEach($scope.scoresTable, function (value, key) {
+                        $scope.scoresTable[name][key] = 0;
+                        value[name] = 0;
+                        //                $log.log(value);
+                    });
+//                    $log.log($scope.scoresTable);
+                } else {
+                    $window.alert(name+' ya está compitiendo! Elegí un apodo como \"'+name+'MASTER\" o rebautizalo definitivamente.');
+                }
         };
 
 
@@ -91,20 +108,20 @@ angular.module('testTableAppApp')
         var updateHS = function(scores){
             angular.forEach(scores, function(value, key) {
                 var sum = 0;
-                angular.forEach(value, function(value2, key2){
+                angular.forEach(value, function(value2){
                     sum += parseInt(value2, 10);
                 });
                 $scope.tableHS[key] = sum;
             });
 //           $log.log($scope.tableHS);
-        }
+        };
 
         $scope.tableHR = {};
         var updateHR = function(scores){
             angular.forEach(scores, function(value, key) {
                 var sum = 0;
                 angular.forEach(scores, function(value2, key2) {
-                    if (key != key2) {
+                    if (key !== key2) {
                         sum += parseInt(value2[key], 10);
                     }
                 });
@@ -125,7 +142,7 @@ angular.module('testTableAppApp')
             angular.forEach(scores, function(value, key){
                 var victories = 0;
                 angular.forEach(scores, function(value2, key2){
-                    if (key != key2){
+                    if (key !== key2){
 //                        $log.log(scores[key][key2]);
                            if (parseInt(scores[key][key2]) > parseInt(scores[key2][key])){
                                victories++;
@@ -139,7 +156,7 @@ angular.module('testTableAppApp')
 
         var updateCompetitorsTable = function(names,tableHS, tableHR, tableDiff, tableVictories){
             $scope.competitorsTable = [];
-            angular.forEach(names, function(value, key){
+            angular.forEach(names, function(value){
                 var competitor = {};
                 competitor.name = value;
                 competitor.Victories = tableVictories[value];
@@ -155,18 +172,23 @@ angular.module('testTableAppApp')
         $scope.tablePositions = {};
         var updatePositions = function(competitorsTable){
             var samePosition = function(a, b){
-                if (a.Victories == b.Victories && a.Diff == b.Diff && a.HR == b.HR)
+//                $log.log(b);
+                if (a.Victories === b.Victories && a.Diff === b.Diff && a.HR === b.HR) {
                     return true;
+                }
                 return false;
             };
             var orderedComp = [];
-            orderedComp = orderBy(competitorsTable, 'Victories', 'Diff', '-HR', 'name'); //TODO DONE. si hay dos iguales, ordena alfabéticamente
+            orderedComp = orderBy(competitorsTable, ['Victories', 'Diff', '-HR', '-name'], true); //defensive es mejor que aggresive. Ordena por nombre al final.
 
             var pos = 1;
+//            $log.log(orderedComp[0]);
             angular.forEach(orderedComp, function(value, key){
-                if (orderedComp[key-1] != null){
+//                $log.log(orderedComp[key]);
+                if (orderedComp[key-1] !== undefined){
                     if (samePosition(orderedComp[key], orderedComp[key-1])){
                         $scope.tablePositions[value.name] = $scope.tablePositions[orderedComp[key-1].name];
+//                        pos++; si quiero puestos vacíos.
                     } else {
                         $scope.tablePositions[value.name] = pos++;
                     }
@@ -175,13 +197,13 @@ angular.module('testTableAppApp')
                 }
             });
         };
-
-        $scope.myData = [
-            {
-                "firstName": "Cox",
-                "lastName": "Carney"
-            }];
-
+//
+//        $scope.myData = [
+//            {
+//                "firstName": "Cox",
+//                "lastName": "Carney"
+//            }];
+$scope.newCompetitor = 'test';
 
 
 
